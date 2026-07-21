@@ -1,54 +1,53 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Footer = () => {
+function Footer() {
   return (
-    <footer className="bg-[#121212] text-white py-12 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-        
-        {/* Brand */}
+    <footer className="bg-[#5A121A] text-white border-t border-[#E5A912]/30 pt-16 pb-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-white/10">
         <div className="space-y-4">
-          <h2 className="text-2xl font-serif text-[#C5A059]">FAYSAN</h2>
-          <p className="text-gray-400 text-sm">
-            Luxury, elegance, and timeless quality for your everyday style.
+          <h3 className="font-serif font-bold text-xl tracking-wide text-white">FAYSAN COLLECTION</h3>
+          <p className="text-xs text-gray-300 font-light leading-relaxed">
+            Experience timeless elegance with our exclusive range of luxury perfumes, artisanal fragrances, and refined lifestyle collections.
           </p>
         </div>
 
-        {/* Links */}
-        <div>
-          <h3 className="font-bold mb-4 text-[#C5A059]">SHOP</h3>
-          <ul className="text-gray-400 text-sm space-y-2">
-            <li>Perfumes</li>
-            <li>Fashion</li>
-            <li>Cosmetics</li>
+        <div className="space-y-4">
+          <h4 className="font-bold text-xs uppercase tracking-[0.2em] text-[#E5A912]">Quick Links</h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><Link to="/" className="hover:text-[#E5A912] transition">Home</Link></li>
+            <li><Link to="/shop" className="hover:text-[#E5A912] transition">Shop Catalog</Link></li>
+            <li><Link to="/about" className="hover:text-[#E5A912] transition">Our Story</Link></li>
+            <li><Link to="/contact" className="hover:text-[#E5A912] transition">Contact Us</Link></li>
           </ul>
         </div>
 
-        {/* Support */}
-        <div>
-          <h3 className="font-bold mb-4 text-[#C5A059]">SUPPORT</h3>
-          <ul className="text-gray-400 text-sm space-y-2">
-            <li>Contact Us</li>
-            <li>Shipping Policy</li>
-            <li>Returns</li>
+        <div className="space-y-4">
+          <h4 className="font-bold text-xs uppercase tracking-[0.2em] text-[#E5A912]">Categories</h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><span className="hover:text-[#E5A912] transition cursor-pointer">Oud Collection</span></li>
+            <li><span className="hover:text-[#E5A912] transition cursor-pointer">Women Fragrances</span></li>
+            <li><span className="hover:text-[#E5A912] transition cursor-pointer">Men Fragrances</span></li>
+            <li><span className="hover:text-[#E5A912] transition cursor-pointer">Unisex Scents</span></li>
           </ul>
         </div>
 
-        {/* Socials */}
-        <div>
-          <h3 className="font-bold mb-4 text-[#C5A059]">FOLLOW US</h3>
-          <div className="flex space-x-4 text-gray-400">
-            {/* Halkan waxaad ku dari kartaa icon-yada */}
-            <span>Instagram</span>
-            <span>Facebook</span>
-          </div>
+        <div className="space-y-4">
+          <h4 className="font-bold text-xs uppercase tracking-[0.2em] text-[#E5A912]">Boutique</h4>
+          <p className="text-sm text-gray-300 font-light">
+            Maka Al-Mukarama Road<br />
+            Mogadishu, Somalia
+          </p>
+          <p className="text-xs text-[#E5A912] font-semibold">+252 61X XXX XXX</p>
         </div>
       </div>
-      
-      <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-xs">
-        &copy; 2026 Faysan Collection. All rights reserved.
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400">
+        <p>&copy; {new Date().getFullYear()} Faysan Collection. All rights reserved.</p>
+        <p className="mt-2 sm:mt-0">Crafted for Luxury & Elegance</p>
       </div>
     </footer>
   );
-};
+}
 
 export default Footer;
