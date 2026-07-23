@@ -8,6 +8,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Wishlist from './components/Wishlist';
 import AdminDashboard from './components/AdminDashboard';
+import AdminOrders from './components/AdminOrders';
+import Auth from './components/Auth';
 
 import Home from './pages/Home';
 import Shop from './pages/Shop';
@@ -25,8 +27,12 @@ function App() {
         <WishlistProvider>
           <Router>
             <Routes>
-              {/* Admin Dashboard & POS Routes */}
+              {/* Admin Dashboard Route */}
               <Route path="/admin/*" element={<AdminDashboard />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              
+              {/* Auth Route */}
+              <Route path="/auth" element={<Auth />} />
 
               {/* Main Storefront Routes */}
               <Route path="/*" element={
@@ -40,11 +46,11 @@ function App() {
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/order-success" element={<OrderSuccess />} />
-                      <Route path="/wishlist" element={<Wishlist />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/contact" element={<Contact />} />
                     </Routes>
                   </main>
+                  <Wishlist />
                   <Footer />
                 </div>
               } />

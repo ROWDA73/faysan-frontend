@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { createOrder } from '../services/orderService'; // <-- Adeegga cusub ee aan dhisnay
 
 function Checkout() {
   const { cart, clearCart } = useCart();
@@ -24,7 +25,7 @@ function Checkout() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (cart.length === 0) {
       alert('Your bag is empty!');
@@ -34,13 +35,28 @@ function Checkout() {
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const orderId = 'FSN-' + Math.floor(100000 + Math.random() * 900000);
+    try {
+      // Diyaarinta xogta loo dirayo Spring Boot Backend
+      const orderPayload = {
+        customerName: formData.fullName,
+        email: formData.phone + "@faysan.so", // ama ku dar email input haddii aad rabto
+        address: `${formData.address}, ${formData.city} (Payment: ${formData.paymentMethod})`,
+        totalAmount: total,
+        items: cart.map(item => ({
+          productName: item.name,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      };
+
+      // U diridda backend-ka
+      const savedOrder = await createOrder(orderPayload);
+      const orderId = 'FSN-' + (savedOrder.id || Math.floor(100000 + Math.random() * 900000));
       
-      // Clear cart items if clearCart function is available in context
+      // Nadiifi gaariga iibsashada
       if (clearCart) clearCart();
 
-      // Redirect to Order Success screen with state
+      // U gudbi bogga guusha (Order Success screen)
       navigate('/order-success', {
         state: {
           orderId,
@@ -49,7 +65,12 @@ function Checkout() {
           shippingInfo: formData
         }
       });
-    }, 1000);
+    } catch (error) {
+      console.error("Cillad ayaa ka dhacay gudbinta dalabka:", error);
+      alert("Waan ka xunnahay, dalabkaaga lama diri karin. Fadlan hubi in backend-kaagu shaqaynayo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -163,7 +184,7 @@ function Checkout() {
             {cart.map((item) => (
               <div key={item.id} className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
                 <div className="flex items-center gap-3">
-                  <img src={item.image} alt={item.name} className="w-14 h-14 object-cover rounded-xl border border-[#E5A912]/30" />
+                  <img src={item.imageUrl || item.image} alt={item.name} className="w-14 h-14 object-cover rounded-xl border border-[#E5A912]/30" />
                   <div>
                     <h4 className="font-serif font-bold text-[#5A121A] text-sm">{item.name}</h4>
                     <p className="text-xs text-gray-500">Qty: {item.quantity}</p>

@@ -1,38 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-
-// Liiska saxda ah ee badeecadahaaga (Waa inuu la mid yahay kan Shop.jsx)
-const productsData = [
-  { id: 1, name: 'Qamar', category: 'PERFUMES', price: 20.00, rating: 4.9, image: '/Qamar.jpeg', description: 'A majestic blend of pure Cambodian oud and warm amber spices.', topNotes: 'Bergamot, Saffron', heartNotes: 'Cambodian Oud, Rose', baseNotes: 'Amber, Musk' },
-  { id: 2, name: 'HAYAATI', category: 'PERFUMES', price: 10.00, rating: 4.8, image: '/Xayaati.jpeg', description: 'An elegant floral symphony wrapped in soft white musk.', topNotes: 'Pink Pepper, Mandarin', heartNotes: 'Jasmine, Tuberose', baseNotes: 'White Musk, Vanilla' },
-  { id: 3, name: 'Blue Elegance', category: 'FASHION', price: 15.00, rating: 5.0, image: '/cabayah4.jpeg', description: 'Rich amber notes combined with golden vanilla and smoky woods.', topNotes: 'Cardamom, Lavender', heartNotes: 'Cedarwood, Patchouli', baseNotes: 'Amber, Vanilla' },
-  { id: 4, name: 'Cosmetic Set', category: 'COSMETICS', price: 65.00, rating: 4.7, image: '/cosmatics.jpeg', description: 'Fresh night-blooming jasmine infused with sweet citrus accords.', topNotes: 'Citrus, Green Apple', heartNotes: 'Jasmine, Peony', baseNotes: 'Soft Woods' },
-  { id: 5, name: 'Royal Oud Intense', category: 'PERFUMES', price: 120.00, rating: 4.9, image: '/9pm1.jpeg', description: 'A powerful masculine fragrance with leather, cedarwood, and spice.', topNotes: 'Spices, Cinnamon', heartNotes: 'Leather, Tobacco', baseNotes: 'Oud, Cedar' },
-  { id: 6, name: 'Golden Silk Abaya', category: 'FASHION', price: 150.00, rating: 5.0, image: '/cabayah2.jpeg', description: 'Our signature luxury creation featuring rare floral oils and aged oud.', topNotes: 'Fruity Accords', heartNotes: 'Damask Rose', baseNotes: 'Aged Oud, Amber' }
-];
+import { useWishlist } from '../context/WishlistContext';
 
 function ProductDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
 
-  // Raadi badeecada saxda ah adigoo isticmaalaya ID-ga URL-ka ku jira
-  const product = productsData.find((p) => p.id === Number(id));
+  // Soo jiidashada hal badeecad oo gaar ah adoo isticmaalaya ID-ga uu URL-ku keenayo
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/products/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Lama heli karo faahfaahinta badeecaddan');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching product details:', err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [id]);
 
-  if (!product) {
+  if (loading) {
     return (
-      <div className="w-full min-h-[70vh] bg-[#FAF8F5] text-[#5A121A] flex flex-col items-center justify-center text-center p-8 space-y-6">
+      <div className="w-full bg-[#FAF8F5] text-[#5A121A] min-h-screen flex items-center justify-center font-sans">
+        <p className="text-xl font-serif animate-pulse">Fadlan sug, faahfaahinta badeecadda waa la soo dejinayaa...</p>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="w-full bg-[#FAF8F5] text-[#5A121A] min-h-screen flex flex-col items-center justify-center font-sans space-y-4">
         <h2 className="text-3xl font-serif font-bold">Product Not Found</h2>
-        <p className="text-sm text-gray-700 font-semibold max-w-md">
-          Badeecadan lama helin ama waa la tirtiray.
-        </p>
+        <p className="text-sm text-gray-600">{error || 'Badeecadda aad raadineyso lama helin ama waa la tirtiray.'}</p>
         <Link
           to="/shop"
-          className="bg-[#5A121A] text-white px-8 py-3.5 uppercase tracking-[0.2em] font-extrabold text-xs rounded shadow hover:bg-[#430d13] transition inline-block"
+          className="bg-[#5A121A] text-white px-6 py-3 rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-[#E5A912] transition"
         >
-          Ku noqo dukaanka
+          Back to Shop
         </Link>
       </div>
     );
@@ -42,89 +60,97 @@ function ProductDetails() {
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
     }
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
   };
 
   return (
-    <div className="w-full bg-[#FAF8F5] text-[#5A121A] min-h-screen font-sans pb-24">
-      {/* Navigation Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <Link to="/shop" className="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-[#5A121A] transition">
-          ← Back to Shop
-        </Link>
+    <div className="w-full bg-[#FAF8F5] text-[#5A121A] min-h-screen font-sans pb-24 overflow-x-hidden">
+      {/* Header Banner */}
+      <div className="w-full bg-[#5A121A] text-white py-12 px-6 text-center space-y-2 border-b border-[#E5A912]/40">
+        <p className="uppercase tracking-[6px] text-[#E5A912] text-xs font-extrabold">
+          FAYSAN COLLECTION
+        </p>
+        <h1 className="text-3xl md:text-4xl font-serif font-bold">PRODUCT DETAILS</h1>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        {/* Product Image */}
-        <div className="bg-white p-6 rounded-2xl border border-[#E5A912]/30 shadow-sm flex items-center justify-center">
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="w-full h-[450px] object-cover rounded-xl border border-gray-100 bg-[#FAF8F5]"
-          />
-        </div>
+      <div className="max-w-6xl mx-auto px-6 md:px-12 pt-12">
+        <Link
+          to="/shop"
+          className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-[#5A121A] hover:text-[#E5A912] mb-8 transition"
+        >
+          ← Back to Shop
+        </Link>
 
-        {/* Product Information */}
-        <div className="space-y-6">
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#E5A912]">
-                {product.category}
-              </span>
-              <span className="text-sm font-bold text-[#E5A912] bg-white px-3 py-1 rounded-full border border-[#E5A912]/30 shadow-sm">
-                ⭐ {product.rating}
-              </span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#5A121A] mt-2">
-              {product.name}
-            </h1>
-            <p className="text-2xl font-bold text-[#5A121A] mt-2">
-              ${product.price.toFixed(2)}
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 md:p-12 rounded-3xl border border-[#E5A912]/30 shadow-sm">
+          {/* Product Image */}
+          <div className="relative overflow-hidden h-[450px] md:h-[520px] rounded-2xl bg-[#F4EFEA] border border-[#E5A912]/20">
+            <img
+              src={product.imageUrl || '/Qamar.jpeg'}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            <button
+              onClick={() => toggleWishlist(product)}
+              className="absolute top-4 right-4 bg-white/90 p-3 rounded-full shadow border border-[#E5A912]/30 hover:scale-110 transition text-red-600"
+              title="Save to Wishlist"
+            >
+              {isInWishlist(product.id) ? '❤️' : '🤍'}
+            </button>
+            <span className="absolute top-4 left-4 bg-[#FAF8F5]/90 text-[#5A121A] text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded border border-[#E5A912]/30">
+              {product.category || 'PERFUMES'}
+            </span>
           </div>
 
-          <p className="text-sm text-gray-700 leading-relaxed font-semibold">
-            {product.description}
-          </p>
+          {/* Product Information */}
+          <div className="flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[#E5A912] font-bold text-sm">⭐ {product.rating || 4.9} Rating</span>
+                <span className="text-2xl font-serif font-bold text-[#5A121A]">${Number(product.price).toFixed(2)}</span>
+              </div>
 
-          {/* Fragrance Profile Specs */}
-          {product.topNotes && (
-            <div className="bg-white p-5 rounded-xl border border-[#E5A912]/20 space-y-2 shadow-sm">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#5A121A]">Fragrance Profile</h4>
-              <p className="text-xs text-gray-700"><strong>Top Notes:</strong> {product.topNotes}</p>
-              <p className="text-xs text-gray-700"><strong>Heart Notes:</strong> {product.heartNotes}</p>
-              <p className="text-xs text-gray-700"><strong>Base Notes:</strong> {product.baseNotes}</p>
-            </div>
-          )}
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#5A121A]">
+                {product.name}
+              </h2>
 
-          {/* Quantity and Add to Cart */}
-          <div className="space-y-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center gap-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Quantity</span>
-              <div className="flex items-center border border-[#E5A912]/40 rounded-lg bg-white">
-                <button 
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 text-sm font-bold text-[#5A121A] hover:bg-gray-100 transition rounded-l-lg"
-                >
-                  -
-                </button>
-                <span className="px-4 text-sm font-bold text-[#5A121A]">{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 text-sm font-bold text-[#5A121A] hover:bg-gray-100 transition rounded-r-lg"
-                >
-                  +
-                </button>
+              <p className="text-gray-700 leading-relaxed text-base">
+                {product.description}
+              </p>
+
+              <div className="border-t border-[#E5A912]/20 pt-4 space-y-2 text-sm text-gray-600">
+                <p><strong className="text-[#5A121A]">Stock:</strong> {product.stock !== undefined ? product.stock : '10'} units available</p>
+                <p><strong className="text-[#5A121A]">Category:</strong> {product.category || 'PERFUMES'}</p>
               </div>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-4 uppercase tracking-[0.2em] font-extrabold text-xs rounded shadow-lg transition duration-300 ${added ? 'bg-green-700 text-white' : 'bg-[#E5A912] text-white hover:bg-[#c9920e]'}`}
-            >
-              {added ? '✓ Added to Cart!' : `Add to Cart - $${(product.price * quantity).toFixed(2)}`}
-            </button>
+            <div className="space-y-6 pt-6 border-t border-[#E5A912]/20">
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-4">
+                <span className="text-xs uppercase font-extrabold tracking-wider text-[#5A121A]">Quantity:</span>
+                <div className="flex items-center border border-[#E5A912]/40 rounded-xl overflow-hidden bg-[#FAF8F5]">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-4 py-2 text-[#5A121A] hover:bg-[#E5A912] hover:text-white transition font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="px-6 py-2 text-sm font-bold text-[#5A121A]">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="px-4 py-2 text-[#5A121A] hover:bg-[#E5A912] hover:text-white transition font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Add to Bag Button */}
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-[#E5A912] text-white py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest hover:bg-[#c9920e] transition shadow-md"
+              >
+                Add {quantity} to Bag - ${(product.price * quantity).toFixed(2)}
+              </button>
+            </div>
           </div>
         </div>
       </div>

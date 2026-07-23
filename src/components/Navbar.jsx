@@ -32,13 +32,23 @@ function Navbar() {
           <Link to="/shop" className="hover:text-[#E5A912] transition">Shop</Link>
           <Link to="/about" className="hover:text-[#E5A912] transition">About Us</Link>
           <Link to="/contact" className="hover:text-[#E5A912] transition">Contact</Link>
+          
+          {/* Admin Link */}
           <Link to="/admin" className="text-xs uppercase bg-[#5A121A] text-[#E5A912] px-3 py-1.5 rounded-lg tracking-widest font-extrabold hover:bg-[#430d13] transition">
             Admin
           </Link>
         </div>
 
-        {/* Right Actions (Wishlist, Bag, & Checkout) */}
+        {/* Right Actions (Wishlist, Login, Bag) */}
         <div className="flex items-center gap-4">
+          {/* Login / Auth Link */}
+          <Link 
+            to="/auth" 
+            className="hidden sm:inline-block text-xs uppercase font-extrabold tracking-widest text-[#5A121A] border border-[#5A121A]/30 px-4 py-2.5 rounded-full hover:bg-[#5A121A] hover:text-white transition"
+          >
+            Sign In
+          </Link>
+
           {/* Wishlist Link */}
           <Link 
             to="/wishlist" 
